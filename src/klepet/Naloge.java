@@ -14,25 +14,20 @@ import org.apache.http.entity.ContentType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Hello ChitChat!
- */
+
 
 @SuppressWarnings("deprecation")
 public class Naloge {
 	
 	
-	public static void main(String[] args) {
-        //get_index();
-        //get_users();
-        //log_in("Oka");
-        //log_out("ime");
-        //send("Pu", "Oka", "Medvedek Pu pošilja prisrcne pozdrave z morja.");
-        //receive("Oka");
-		
+	public static void main(String[] args) {	
     }
+	
 	public static void get_index(){
         try {
             String hello = Request.Get("http://chitchat.andrej.com")
@@ -110,42 +105,49 @@ public class Naloge {
 		}
 
 	}
-	public static void send (String me, String myMessage ){
-		  URI uri;
-		try {
-			uri = new URIBuilder("http://chitchat.andrej.com/messages")
-			          .addParameter("username", me)
-			          .build();
-
-			String message = "{ \"global\" : true, \"text\" : \""+myMessage+"\"}";
-			  
-			String responseBody = Request.Post(uri)
-			          .bodyString(message, ContentType.APPLICATION_JSON)
-			          .execute()
-			          .returnContent()
-			          .asString();
-			System.out.println(responseBody);
-			
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void send (String me, String myMessage ){
+//		try {
+//			URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
+//			          .addParameter("username", me)
+//			          .build();
+//
+//			ObjectMapper mapper = new ObjectMapper();
+//			mapper.setDateFormat(new ISO8601DateFormat());
+//			
+//			String message = "{ \"global\" : true, \"text\" : \""+myMessage+"\"}";
+//			  
+//			String responseBody = Request.Post(uri)
+//			          .bodyString(message, ContentType.APPLICATION_JSON)
+//			          .execute()
+//			          .returnContent()
+//			          .asString();
+//			System.out.println(responseBody);
+//			
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		} catch (ClientProtocolException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
-	public static void send (String me, String friend, String myMessage ){
-		 URI uri;
+	public static void send (Boolean global, String recipient, String sender, String text, String sent_at){
+		System.out.println("mewmew");
 			try {
-				uri = new URIBuilder("http://chitchat.andrej.com/messages")
-				          .addParameter("username", me)
+				URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
+				          .addParameter("username", sender)
 				          .build();
-
-				String message = "{ \"global\" : false, \"recipient\" : \""+friend+"\", \"text\" : \""+myMessage+"\"}";
-				  
+				
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.setDateFormat(new ISO8601DateFormat());
+				
+				Sporocilo message = new Sporocilo(global, recipient, sender, text, sent_at);
+				String jsonMessage = mapper.writeValueAsString(message);
+				System.out.println(jsonMessage);
+				
 				String responseBody = Request.Post(uri)
-				          .bodyString(message, ContentType.APPLICATION_JSON)
+				          .bodyString(jsonMessage, ContentType.APPLICATION_JSON)
 				          .execute()
 				          .returnContent()
 				          .asString();
@@ -179,6 +181,16 @@ public class Naloge {
 			e.printStackTrace();
 		}		  
 	}
+	
+	//Trenutni cas oblike HH:mm.
+	public static String trenutniCas() {
+		Calendar cal = Calendar.getInstance();
+		Date cas = cal.getTime();
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+		String trenutni = df.format(cas);
+		return trenutni;
 	}
+	
+}
 	
 

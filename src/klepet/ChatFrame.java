@@ -218,7 +218,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
-				Naloge.send(klepetalec, this.input.getText());
+				
+				Naloge.send(true, null, klepetalec, this.input.getText(), Naloge.trenutniCas());
 				//this.addMessage(this.getVzdevek_vnos().getText(), this.input.getText());
 				this.input.setText("");
 			}

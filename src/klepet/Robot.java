@@ -9,13 +9,6 @@ public class Robot extends TimerTask {
 	private Timer timer;
 	private int k;
 	
-	private static boolean isPrime(int n) {
-		for (int i = 2; i * i <= n; i++) {
-			if (n % i == 0) { return false; }
-		}
-		return true;
-	}
-
 	public Robot(ChatFrame chat) {
 		this.chat = chat;
 		this.k = 2;

@@ -9,16 +9,17 @@ public class Sporocilo {
 	private String sender;
 	private String recipient;
 	private String text;
-	private Date sent_at;
+	private String sent_at;
 		
+	@SuppressWarnings("unused")
 	private Sporocilo() {}
 	
-	public Sporocilo(Boolean javno, String recipient, String posiljatelj, String besedilo, Date poslano_ob) {
-		this.global = javno;
+	public Sporocilo(Boolean global, String recipient, String sender, String text, String sent_at) {
+		this.global = global;
 		this.recipient = recipient;
-		this.sender = posiljatelj;
-		this.text = besedilo;
-		this.sent_at = poslano_ob;
+		this.sender = sender;
+		this.text = text;
+		this.sent_at = sent_at;
 		
 	}
 	
@@ -52,7 +53,7 @@ public class Sporocilo {
 	}
 	
 	@JsonProperty("sent_at")
-	public Date getSent_at() {
+	public String getSent_at() {
 		return sent_at;
 	}
 }
