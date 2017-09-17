@@ -20,6 +20,7 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -132,14 +133,14 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		this.output.setText(chat + person + ": " + message + "\n");
 	}
 	
-	public void izpisUporabnikov () {
+	public void izpisUporabnikov () throws ParseException {
 		klepetalci.removeAll();
 		List<Uporabnik> uporabniki = Naloge.get_users(); 
 		for (Uporabnik uporabnik : uporabniki) {
 			String ime = uporabnik.getUsername();
 			String aktiven = String.valueOf(uporabnik.getLastActive());
 			
-			JButton gumb_aktivnez = new JButton(ime+aktiven);
+			JButton gumb_aktivnez = new JButton(ime + " " + aktiven + " min");
 			klepetalci.add(gumb_aktivnez);
 			gumb_aktivnez.setAlignmentX(Component.CENTER_ALIGNMENT);
 			gumb_aktivnez.setBackground(Color.white);

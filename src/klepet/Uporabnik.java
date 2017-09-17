@@ -1,5 +1,7 @@
 package klepet;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,16 +38,10 @@ public class Uporabnik {
 	}
 
 	@JsonProperty("last_active")
-	public long getLastActive() {
+	public long getLastActive(){
 		Calendar cal = Calendar.getInstance();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-		LocalDateTime trenutno= LocalDateTime.parse(cal.getTime().toString(), formatter);
-		LocalDateTime aktiven= LocalDateTime.parse(this.lastActive.toString(), formatter);
-
-		long diffInMinutes = java.time.Duration.between(trenutno, aktiven).toMinutes();
-
-		return diffInMinutes;
+		return (cal.getTimeInMillis() - this.lastActive.getTime());
 	}
 
 	public void setLastActive(Date lastActive) {

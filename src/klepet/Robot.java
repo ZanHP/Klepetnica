@@ -1,5 +1,6 @@
 package klepet;
 
+import java.text.ParseException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,7 +32,12 @@ public class Robot extends TimerTask {
 	public void run() {
 		if (isPrime(this.k)) {
 			chat.addMessage("primer", "k");
-			chat.izpisUporabnikov();
+			try {
+				chat.izpisUporabnikov();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		this.k++;
 	}
