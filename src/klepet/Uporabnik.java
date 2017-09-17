@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.json.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -40,8 +41,8 @@ public class Uporabnik {
 	@JsonProperty("last_active")
 	public long getLastActive(){
 		Calendar cal = Calendar.getInstance();
-
-		return (cal.getTimeInMillis() - this.lastActive.getTime());
+		long cas = TimeUnit.MILLISECONDS.toMinutes(cal.getTimeInMillis() - this.lastActive.getTime());
+		return cas;
 	}
 
 	public void setLastActive(Date lastActive) {

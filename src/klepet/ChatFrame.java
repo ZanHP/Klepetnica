@@ -6,8 +6,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -23,6 +25,8 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,17 +36,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.border.LineBorder;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
 
-public class ChatFrame extends JFrame implements ActionListener, KeyListener, WindowListener {
+public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	private JTextArea output; //sporocila
 	private JTextField input; //vnos sporocila
-	private JTextField ime; //vnos vzdevka
-	private JPanel klepetalci;
+	private JTextField vzdevek_vnos; //vnos vzdevka
+	private JPanel uporabniki_panel;
 	
 	private JButton gumb_prijavi;
 	private JButton gumb_odjavi;
@@ -53,6 +58,20 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		super();
 		Container pane = this.getContentPane();
 		pane.setLayout(new GridBagLayout());
+		this.setTitle("blabla");
+		this.setMinimumSize(new Dimension(700,500));
+		
+//		this.addWindowListener(new FrameListener());
+//		this.addWindowListener(new WindowAdapter()); {
+//			@Override
+//			public void windowClosing(WindowEvent e) {
+//				System.out.println("zapiranje okna");
+//				if (vzdevek_vnos.isFocusOwner() == false) {
+//					Naloge.log_out(klepetalec);
+//				}
+//				ChitChat.robot.deactivate();		
+//			}
+//		}
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -66,7 +85,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		
 		pane.add(panel, panelConstraint);
 		
-		this.setTitle("blabla");
+		
 		this.output = new JTextArea(20, 40);
 		this.output.setEditable(false);
 		JScrollPane scroll = new JScrollPane(output);
@@ -92,10 +111,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		
 		
 		//Prostor za vzdevek.
-		JLabel vzdevek = new JLabel("Ime:");
-		panel.add(vzdevek);
-		ime = new JTextField(20);
-		panel.add(ime);
+		JLabel vzdevek_napis = new JLabel("Ime:");
+		panel.add(vzdevek_napis);
+		setVzdevek_vnos(new JTextField(20));
+		panel.add(getVzdevek_vnos());
 		
 		gumb_prijavi = new JButton("Prijavi se!");
 		panel.add(gumb_prijavi);
@@ -108,68 +127,88 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		
 		
 		//Prostor za izpis prijavljenih klepetalcev.
-		this.klepetalci = new JPanel();
-		JScrollPane klepetalciPane = new JScrollPane(klepetalci);
-		klepetalciPane.setPreferredSize(new Dimension(100, 300)); 
+		this.uporabniki_panel = new JPanel();
+		JScrollPane uporabniki_scroll = new JScrollPane(uporabniki_panel);
+		uporabniki_scroll.setPreferredSize(new Dimension(160, 300)); 
 		//this.klepetalci.setEditable(false);
-		GridBagConstraints klepConstraint = new GridBagConstraints();
-		klepConstraint.fill = GridBagConstraints.BOTH;
-		klepConstraint.gridheight = 2;
-		klepConstraint.weightx = 0;
-		klepConstraint.weighty = 1;
-		klepConstraint.gridx = 1;
-		klepConstraint.gridy = 1;
-		pane.add(klepetalciPane, klepConstraint);
+		GridBagConstraints uporscrollConstraint = new GridBagConstraints();
+		uporscrollConstraint.fill = GridBagConstraints.BOTH;
+		uporscrollConstraint.gridheight = 2;
+		uporscrollConstraint.weightx = 0;
+		uporscrollConstraint.weighty = 1;
+		uporscrollConstraint.gridx = 1;
+		uporscrollConstraint.gridy = 1;
+		uporabniki_panel.setLayout((LayoutManager) new BoxLayout(uporabniki_panel, BoxLayout.Y_AXIS));
+
+		pane.add(uporabniki_scroll, uporscrollConstraint);
+		
+		
 		
 	}
 	
 	    
-	/**
-	 * @param person - the person sending the message
-	 * @param message - the message content
-	 */
-	public void addMessage(String person, String message) {
+	public void addMessage(String posiljatelj, String sporocilo) {
 		String chat = this.output.getText();
-		this.output.setText(chat + person + ": " + message + "\n");
+		this.output.setText(chat + posiljatelj + ": " + sporocilo + "\n");
 	}
 	
 	public void izpisUporabnikov () throws ParseException {
-		klepetalci.removeAll();
+		uporabniki_panel.removeAll();
 		List<Uporabnik> uporabniki = Naloge.get_users(); 
+		
 		for (Uporabnik uporabnik : uporabniki) {
 			String ime = uporabnik.getUsername();
-			String aktiven = String.valueOf(uporabnik.getLastActive());
 			
-			JButton gumb_aktivnez = new JButton(ime + " " + aktiven + " min");
-			klepetalci.add(gumb_aktivnez);
-			gumb_aktivnez.setAlignmentX(Component.CENTER_ALIGNMENT);
-			gumb_aktivnez.setBackground(Color.white);
-			
+			if ((ime.equals(this.getVzdevek_vnos().getText())) == false) { //svojega imena ne vidimo med prijavljenimi
+				String aktiven = String.valueOf(uporabnik.getLastActive());
+				
+				JButton gumb_aktivnez = new JButton(ime + " " + aktiven + " min");
+				gumb_aktivnez.setBorder(new LineBorder(Color.RED));
+				gumb_aktivnez.setFont(gumb_aktivnez.getFont().deriveFont(Font.BOLD, 14f));
+				gumb_aktivnez.setSize(new Dimension(140, 40) );
+				gumb_aktivnez.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+				gumb_aktivnez.setBorder(BorderFactory.createEtchedBorder(1));
+				gumb_aktivnez.setAlignmentX(Component.CENTER_ALIGNMENT);
+				
+				//glede na aktivnost dolocimo barvo
+				if (Integer.valueOf(aktiven) < 2) {
+					gumb_aktivnez.setBackground(Color.green);
+				} else {
+					if (Integer.valueOf(aktiven) < 4) {
+						gumb_aktivnez.setBackground(Color.yellow);
+					} else {
+						if (Integer.valueOf(aktiven) < 8) {
+							gumb_aktivnez.setBackground(Color.orange);
+						} else {
+							gumb_aktivnez.setBackground(Color.red);
+								
+				}}}
+				uporabniki_panel.add(gumb_aktivnez);	
+			}
 		}
-		klepetalci.revalidate();
-		klepetalci.repaint();
+		uporabniki_panel.revalidate();
+		uporabniki_panel.repaint();
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if (e.getSource() == gumb_prijavi) {
-			klepetalec = ime.getText();
+			klepetalec = getVzdevek_vnos().getText();
 			gumb_prijavi.setEnabled(false);
 			gumb_odjavi.setEnabled(true);
 			input.setEditable(true);
-			ime.setEditable(false);
+			getVzdevek_vnos().setEditable(false);
 			input.requestFocusInWindow();
 			Naloge.log_in(klepetalec);
 		}
 		
 		if (e.getSource() == this.gumb_odjavi) {
-			klepetalec = ime.getText();
 			gumb_prijavi.setEnabled(true);
 			gumb_odjavi.setEnabled(false);
 			input.setEditable(false);
-			ime.setEditable(true);
-			ime.requestFocusInWindow();
+			getVzdevek_vnos().setEditable(true);
+			getVzdevek_vnos().requestFocusInWindow();
 			Naloge.log_out(klepetalec);
 			}
 		}
@@ -179,12 +218,47 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
-				
-				this.addMessage(this.ime.getText(), this.input.getText());
+				Naloge.send(klepetalec, this.input.getText());
+				//this.addMessage(this.getVzdevek_vnos().getText(), this.input.getText());
 				this.input.setText("");
 			}
 		}		
 	}
+
+	public void windowClosed(WindowEvent e) {
+		if (getVzdevek_vnos().isFocusOwner() == false) {
+			Naloge.log_out(klepetalec);
+		}
+		ChitChat.robot.deactivate();
+
+	}
+
+
+	public void windowClosing(WindowEvent e) {
+		System.out.println("zapiranje okna");
+		if (vzdevek_vnos.isFocusOwner() == false) {
+			Naloge.log_out(klepetalec);
+		}
+		ChitChat.robot.deactivate();
+
+	}
+
+	public void windowOpened(WindowEvent e) {
+		System.out.println("odpiranje okna");
+		getVzdevek_vnos().requestFocusInWindow();
+		
+	}
+
+
+	public JTextField getVzdevek_vnos() {
+		return vzdevek_vnos;
+	}
+
+
+	public void setVzdevek_vnos(JTextField vzdevek_vnos) {
+		this.vzdevek_vnos = vzdevek_vnos;
+	}
+
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -192,52 +266,30 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener, Wi
 		
 	}
 
+
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		if (ime.hasFocus() == false) {
+	
+	public void zapiranje() {
+		System.out.println("zapiranje okna");
+		if (getVzdevek_vnos().isFocusOwner() == false) {
 			Naloge.log_out(klepetalec);
 		}
-	}
+		ChitChat.robot.deactivate();		
+		}
 
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		ime.requestFocusInWindow();
-		
-	}
+//class FrameListener extends WindowAdapter {
+//   public void windowClosing(WindowEvent e){
+//		this.zapiranje();
+//  }
+//
+//private void zapiranje() {
+//	zapiranje();
+	
 }
+
+

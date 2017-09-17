@@ -6,6 +6,7 @@ import java.util.TimerTask;
 
 public class Robot extends TimerTask {
 	private ChatFrame chat;
+	private Timer timer;
 	private int k;
 	
 	private static boolean isPrime(int n) {
@@ -20,17 +21,18 @@ public class Robot extends TimerTask {
 		this.k = 2;
 	}
 
-	/**
-	 * Activate the robot!
-	 */
 	public void activate() {
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(this, 5000, 1000);
+		timer = new Timer();
+		timer.scheduleAtFixedRate(this, 1000, 2400);
+	}
+
+	public void deactivate() {
+		timer.cancel();
+		System.out.println("deakticacija");
 	}
 	
 	@Override
 	public void run() {
-		if (isPrime(this.k)) {
 			chat.addMessage("primer", "k");
 			try {
 				chat.izpisUporabnikov();
@@ -38,7 +40,7 @@ public class Robot extends TimerTask {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+			
 		this.k++;
 	}
 }

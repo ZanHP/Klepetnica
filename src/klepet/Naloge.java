@@ -161,9 +161,8 @@ public class Naloge {
 	}
 	
 	public static void receive (String me) {
-		 URI uri;
 		try {
-			uri = new URIBuilder("http://chitchat.andrej.com/messages")
+			URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
 			          .addParameter("username", me)
 			          .build();
 			String responseBody;
