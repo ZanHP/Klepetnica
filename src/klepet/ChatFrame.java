@@ -68,17 +68,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.setTitle("blabla");
 		this.setMinimumSize(new Dimension(700,500));
 		
-//		this.addWindowListener(new FrameListener());
-//		this.addWindowListener(new WindowAdapter()); {
-//			@Override
-//			public void windowClosing(WindowEvent e) {
-//				System.out.println("zapiranje okna");
-//				if (vzdevek_vnos.isFocusOwner() == false) {
-//					Naloge.log_out(klepetalec);
-//				}
-//				ChitChat.robot.deactivate();		
-//			}
-//		}
+
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
