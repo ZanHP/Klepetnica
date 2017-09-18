@@ -14,13 +14,17 @@ public class Sporocilo {
 	@SuppressWarnings("unused")
 	private Sporocilo() {}
 	
-	public Sporocilo(Boolean global, String recipient, String sender, String text, String sent_at) {
+	//zasebno sporocilo
+	public Sporocilo(Boolean global, String recipient, String text) {
 		this.global = global;
 		this.recipient = recipient;
-		this.sender = sender;
 		this.text = text;
-		this.sent_at = sent_at;
-		
+	}
+	
+	//javno sporocilo
+	public Sporocilo(Boolean global, String text) {
+		this.global = global;
+		this.text = text;
 	}
 	
 	@Override

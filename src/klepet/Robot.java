@@ -21,14 +21,18 @@ public class Robot extends TimerTask {
 
 	public void deactivate() {
 		timer.cancel();
-		System.out.println("deakticacija");
+		System.out.println("deaktivacija");
 	}
 	
 	@Override
 	public void run() {
-			chat.addMessage("primer", "k");
+			//chat.addMessage("primer", "k");
 			try {
 				chat.izpisUporabnikov();
+				if (chat.prijavljen) {
+					chat.izpisSporocil();
+				}
+				
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
