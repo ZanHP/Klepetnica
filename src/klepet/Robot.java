@@ -6,6 +6,7 @@ import java.util.TimerTask;
 
 public class Robot extends TimerTask {
 	private ChatFrame chat;
+	private Zasebni_klepet zasebni_chat;
 	private Timer timer;
 	private int k;
 	
@@ -13,6 +14,12 @@ public class Robot extends TimerTask {
 		this.chat = chat;
 		this.k = 2;
 	}
+	
+	public Robot(Zasebni_klepet zasebni_chat) {
+		this.zasebni_chat = zasebni_chat;
+		this.k = 2;
+	}
+	
 
 	public void activate() {
 		timer = new Timer();

@@ -13,7 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -24,10 +27,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-public class Zasebni_klepet extends JFrame implements ActionListener, KeyListener {
+public class Zasebni_klepet extends JFrame implements ActionListener, KeyListener, WindowListener {
 	
 	private JTextArea output; //sporocila
 	private JTextField input; //vnos sporocila
+	private String uporabnik = "";
 
 	
 	public Zasebni_klepet(String uporabnik) {
@@ -73,90 +77,34 @@ public class Zasebni_klepet extends JFrame implements ActionListener, KeyListene
 		scrollConstraint.gridx = 0;
 		scrollConstraint.gridy = 1;
 		pane.add(scroll, scrollConstraint);
+		
+		addWindowListener(new WindowAdapter() {
+			public void windowOpened(WindowEvent e) {
+				input.requestFocusInWindow();
+			}
+		});
+
+		this.uporabnik = uporabnik;
 	}
 	
-		
-	
-//		super();
-//		Container pane = this.getContentPane();
-//		pane.setLayout(new GridLayout(2,0));
-//		this.setTitle(uporabnik);
-//		this.setMinimumSize(new Dimension(300,200));
-//		
-////		JPanel panel = new JPanel();
-////		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
-////		pane.add(panel);
-//		
-//		JPanel panel = new JPanel();
-//		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-//		
-//		GridBagConstraints panelConstraint = new GridBagConstraints();
-//		panelConstraint.weightx = 1;
-//		panelConstraint.weighty = 0;
-//		panelConstraint.gridx = 0;
-//		panelConstraint.gridy = 0;
-//		panelConstraint.fill = GridBagConstraints.HORIZONTAL;
-//		
-//		pane.add(panel, panelConstraint);
-//		
-//		this.input = new JTextField(20);
-//		GridBagConstraints inputConstraint = new GridBagConstraints();
-//		inputConstraint.weightx = 1;
-//		inputConstraint.weighty = 0;
-//		inputConstraint.fill = GridBagConstraints.HORIZONTAL;
-//		inputConstraint.gridx = 0;
-//		inputConstraint.gridy = 2;
-//		pane.add(input, inputConstraint);
-//		input.addKeyListener(this);
-//		
-//		this.output = new JTextArea(20,20);
-//		this.output.setEditable(false);
-//		
-//		JScrollPane scroll = new JScrollPane(output);
-//        
-//		GridBagConstraints scrollConstraint = new GridBagConstraints();
-//		scrollConstraint.weightx = 1;
-//		scrollConstraint.weighty = 1;
-//		scrollConstraint.fill = GridBagConstraints.BOTH;
-//		scrollConstraint.gridx = 0;
-//		scrollConstraint.gridy = 1;
-//		pane.add(scroll, scrollConstraint);
-//	}
-	
-	public static void zasebni_pogovor(String uporabnik) {
-		 EventQueue.invokeLater(new Runnable()
-	        {
-	            @Override
-	            public void run()
-	            {
-	                JFrame frame = new JFrame(uporabnik);
-	                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	                
-	                JPanel panel = new JPanel();
-	                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-	                //panel.setOpaque(true);
-	                JTextArea textArea = new JTextArea(15, 20);
-	                textArea.setWrapStyleWord(true);
-	                textArea.setEditable(false);
-	                textArea.setFont(Font.getFont(Font.SANS_SERIF));
-	                JScrollPane scroller = new JScrollPane(textArea);
 
-	                JPanel inputpanel = new JPanel();
-	                inputpanel.setLayout(new FlowLayout());
-	                JTextField input = new JTextField(20);
-	                //JButton button = new JButton("Enter");
-	                panel.add(scroller);
-	                inputpanel.add(input);
-	                //inputpanel.add(button);
-	                panel.add(inputpanel);
-	                frame.getContentPane().add(BorderLayout.CENTER, panel);
-	                frame.pack();
-	                frame.setLocationByPlatform(true);
-	                frame.setVisible(true);
-	                frame.setResizable(false);
-	                input.requestFocus();
-	            }
-	        });
+	private void addMessage(String posiljatelj, String sporocilo) {
+		String chat = this.output.getText();
+		this.output.setText(chat + posiljatelj + ": " + sporocilo + "  , ob " + Naloge.trenutniCas() + "\n");
+	}
+	
+	public void izpisSporocil() {
+		List<Sporocilo> sporocila = Naloge.receive(ChatFrame.klepetalec); 
+		if (sporocila.isEmpty()) { 
+			} else {		
+			for (Sporocilo sporocilo : sporocila) {
+				String posiljatelj = sporocilo.getSender();
+				if (posiljatelj.equals(uporabnik)) {
+					String besedilo = sporocilo.getText();
+					this.addMessage(posiljatelj, besedilo);
+				}
+			}
+			}
 	}
 
 	@Override
@@ -172,13 +120,79 @@ public class Zasebni_klepet extends JFrame implements ActionListener, KeyListene
 	}
 
 	@Override
-	public void keyTyped(KeyEvent arg0) {
+	public void keyTyped(KeyEvent e) {
+		if (e.getSource() == this.input) {
+			if (e.getKeyChar() == '\n') {
+				if (this.input.getText().equals("") == false) {
+					Naloge.send(false, uporabnik, ChatFrame.klepetalec, this.input.getText());
+					this.addMessage(ChatFrame.klepetalec, this.input.getText());
+					this.input.setText("");
+					}
+				}
+		}
+		
+	}
+
+
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
+
+
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void windowOpened(WindowEvent e) {
 		// TODO Auto-generated method stub
 		
 	}

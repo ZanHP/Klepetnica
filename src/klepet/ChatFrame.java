@@ -56,7 +56,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JButton gumb_prijavi;
 	private JButton gumb_odjavi;
 	
-	public String klepetalec = System.getProperty("user.name");
+	public static String klepetalec = System.getProperty("user.name");
 	public Boolean prijavljen = false;
 	
 	public List<String> zasebni_klepeti;
@@ -201,8 +201,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	private void zasebni_pogovor(String uporabnik) {
 		Zasebni_klepet zasebni = new Zasebni_klepet(uporabnik);
+		Robot zasebni_robot = new Robot(zasebni);
 		zasebni.pack();
 		zasebni.setVisible(true);
+		zasebni_robot.activate();
 		zasebni_klepeti.add(uporabnik);
 		System.out.println(zasebni_klepeti);
 	}
@@ -257,6 +259,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+		//TODO
 		if (e.getSource() == this.vzdevek_vnos) {
 			System.out.println("pritisk_vpis");
 			if (e.getKeyChar() == '\n') {
