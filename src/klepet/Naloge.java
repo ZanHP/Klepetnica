@@ -86,17 +86,19 @@ public class Naloge {
 	public static void send(Boolean global, String recipient, String sender, String text) {
 		try {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/messages").addParameter("username", sender).build();
-
+			System.out.println(uri);
+			
+			
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.setDateFormat(new ISO8601DateFormat());
 
 			Sporocilo message = new Sporocilo(global, recipient, text);
 			String jsonMessage = mapper.writeValueAsString(message);
-			System.out.println(jsonMessage);
+			System.out.println("json message: " + jsonMessage);
 
 			String responseBody = Request.Post(uri).bodyString(jsonMessage, ContentType.APPLICATION_JSON).execute()
 					.returnContent().asString();
-			System.out.println(responseBody);
+			System.out.println("responseBody: " + responseBody);
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -116,10 +118,11 @@ public class Naloge {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/messages").addParameter("username", me).build();
 			String responseBody = Request.Get(uri).execute().returnContent().asString();
 			String sporocila = responseBody;
-			TypeReference<List<Sporocilo>> t = new TypeReference<List<Sporocilo>>() {
-			};
+			
+			TypeReference<List<Sporocilo>> t = new TypeReference<List<Sporocilo>>() {};
 			List<Sporocilo> uporSporocila = mapper.readValue(sporocila, t);
-			System.out.println(uporSporocila);
+			
+			//System.out.println("prejeto za " + me + ": " + uporSporocila);
 			return (uporSporocila);
 
 		} catch (URISyntaxException e) {

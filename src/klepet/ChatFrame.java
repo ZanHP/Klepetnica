@@ -26,7 +26,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -56,10 +59,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JButton gumb_prijavi;
 	private JButton gumb_odjavi;
 	
-	public static String klepetalec = System.getProperty("user.name");
+	public static String jaz_klepetalec = System.getProperty("user.name");
 	public Boolean prijavljen = false;
 	
-	public List<String> zasebni_klepeti;
+	public Map<String, ZasebniKlepet> zasebni_klepeti;
+	static List<Sporocilo> sporocila = Collections.emptyList();
 
 	public ChatFrame() {
 		super();
@@ -141,7 +145,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 		pane.add(uporabniki_scroll, uporscrollConstraint);
 		
-		zasebni_klepeti = new ArrayList<String>(); //seznam odprtih zasebnih pogovorov
+		zasebni_klepeti = new HashMap<String, ZasebniKlepet>(); //seznam robotov zasebnih pogovorov
 		
 	}
 	
@@ -200,24 +204,29 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	
 	private void zasebni_pogovor(String uporabnik) {
-		Zasebni_klepet zasebni = new Zasebni_klepet(uporabnik);
-		Robot zasebni_robot = new Robot(zasebni);
+		ZasebniKlepet zasebni = new ZasebniKlepet(uporabnik);
+		//Robot zasebni_robot = new Robot(zasebni);
 		zasebni.pack();
 		zasebni.setVisible(true);
-		zasebni_robot.activate();
-		zasebni_klepeti.add(uporabnik);
+		//zasebni_robot.activate();
+		zasebni_klepeti.put(uporabnik, zasebni);
 		System.out.println(zasebni_klepeti);
 	}
 	
+	
+	
 	public void izpisSporocil() {
-		List<Sporocilo> sporocila = Naloge.receive(klepetalec); 
+		
+		System.out.println("JAVNI izpis vseh za " + ChatFrame.jaz_klepetalec + ": " + sporocila);
 		if (sporocila.isEmpty()) { 
 			} else {		
 			for (Sporocilo sporocilo : sporocila) {
-				String besedilo = sporocilo.getText();
-				String posiljatelj = sporocilo.getSender();
-				this.addMessage(posiljatelj, besedilo);
-			}
+				if (sporocilo.getGlobal()) {
+					String besedilo = sporocilo.getText();
+					String posiljatelj = sporocilo.getSender();
+					this.addMessage(posiljatelj, besedilo);
+				}
+				}
 			}
 	}
 	
@@ -225,12 +234,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if (e.getSource() == gumb_prijavi) {
-			klepetalec = vzdevek_vnos.getText();
-			vpis(klepetalec);
+			jaz_klepetalec = vzdevek_vnos.getText();
+			vpis(jaz_klepetalec);
 		}
 		
 		if (e.getSource() == this.gumb_odjavi) {
-			izpis(klepetalec);
+			izpis(jaz_klepetalec);
 			}
 		}
 	
@@ -264,13 +273,13 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			System.out.println("pritisk_vpis");
 			if (e.getKeyChar() == '\n') {
 				System.out.println("enter_vpis");
-				vpis(klepetalec);
+				vpis(jaz_klepetalec);
 			}
 		}
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
 				if (this.input.getText().equals("") == false) {
-					Naloge.send(true, "", klepetalec, this.input.getText());
+					Naloge.send(true, "", jaz_klepetalec, this.input.getText());
 					this.addMessage(this.vzdevek_vnos.getText(), this.input.getText());
 					this.input.setText("");
 					}
@@ -280,7 +289,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 	public void windowClosed(WindowEvent e) {
 		if (prijavljen) {
-			Naloge.log_out(klepetalec);
+			Naloge.log_out(jaz_klepetalec);
 		}
 		ChitChat.robot.deactivate();
 
@@ -290,7 +299,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void windowClosing(WindowEvent e) {
 		System.out.println("zapiranje okna");
 		if (prijavljen) {
-			Naloge.log_out(klepetalec);
+			Naloge.log_out(jaz_klepetalec);
 		}
 		ChitChat.robot.deactivate();
 
@@ -319,7 +328,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void zapiranje() {
 		System.out.println("zapiranje okna");
 		if (vzdevek_vnos.isFocusOwner() == false) {
-			Naloge.log_out(klepetalec);
+			Naloge.log_out(jaz_klepetalec);
 		}
 		ChitChat.robot.deactivate();		
 		}

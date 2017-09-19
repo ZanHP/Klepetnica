@@ -1,29 +1,28 @@
 package klepet;
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Robot extends TimerTask {
 	private ChatFrame chat;
-	private Zasebni_klepet zasebni_chat;
+	private ZasebniKlepet zasebni_chat;
 	private Timer timer;
-	private int k;
 	
 	public Robot(ChatFrame chat) {
 		this.chat = chat;
-		this.k = 2;
 	}
 	
-	public Robot(Zasebni_klepet zasebni_chat) {
+	public Robot(ZasebniKlepet zasebni_chat) {
 		this.zasebni_chat = zasebni_chat;
-		this.k = 2;
 	}
 	
 
 	public void activate() {
 		timer = new Timer();
-		timer.scheduleAtFixedRate(this, 1000, 2400);
+		timer.scheduleAtFixedRate(this, 1000, 5000);
+		System.out.println("aktivacija");
 	}
 
 	public void deactivate() {
@@ -31,21 +30,31 @@ public class Robot extends TimerTask {
 		System.out.println("deaktivacija");
 	}
 	
+	
 	@Override
 	public void run() {
-			//chat.addMessage("primer", "k");
-			try {
-				chat.izpisUporabnikov();
-				if (chat.prijavljen) {
-					chat.izpisSporocil();
+		//obnovimo vsa prejeta sporocila
+		ChatFrame.sporocila = Naloge.receive(ChatFrame.jaz_klepetalec); 
+		try {
+			chat.izpisUporabnikov();
+			if (chat.prijavljen) {
+				chat.izpisSporocil();
+				//System.out.println("izpis javnih sporocil");
+			}	
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (chat.zasebni_klepeti.isEmpty() == false) {
+			//gremo po vseh uporabnikih, s katerimi imamo odprte zasebne pogovore
+			for (String uporabnik : chat.zasebni_klepeti.keySet()) {
+				//System.out.println(uporabnik + " poslal zasebna meni, robot");
+				chat.zasebni_klepeti.get(uporabnik).izpisSporocil();
 				}
-				
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			};
+		}
 			
-		this.k++;
-	}
 }
+
+
 
