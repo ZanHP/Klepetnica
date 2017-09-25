@@ -16,6 +16,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -27,11 +28,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener {
 	
-	private JTextArea output; //sporocila
+	private JTextPane output; //sporocila
 	private JTextField input; //vnos sporocila
 	private String uporabnik = "";
 
@@ -79,8 +84,10 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		input.addKeyListener(this);
 		
 		
-		this.output = new JTextArea(20, 30);
-		this.output.setEditable(false);
+		this.output = new JTextPane();
+		this.output.setText("<html>");
+		this.output.setContentType("text/html");
+		this.output.setEditable(false); 
 		
 		JScrollPane scroll = new JScrollPane(output);
 		        
@@ -103,9 +110,26 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 	
 
 	private void addMessage(String posiljatelj, String sporocilo, String cas) {
-		String novo = " " + posiljatelj + ": " + sporocilo + "  , ob " + cas + "\n";
-		this.output.append(novo);
+		HTMLDocument doc = (HTMLDocument) output.getDocument(); 
+		HTMLEditorKit editorKit = (HTMLEditorKit) output.getEditorKit();
+		
+		String novo = "<font face='courier new'><b>" + posiljatelj + "</b>" + ": " + 
+						sporocilo + "&nbsp &nbsp </font>" + "<font face='courier new' size='3'>ob " + cas + "</font>";
+		if (posiljatelj.equals(ChatFrame.jaz_klepetalec)) {
+			novo = "&nbsp &nbsp &nbsp &nbsp" + novo;
+		}
+		try {
+        	editorKit.insertHTML(doc, doc.getLength(), novo, 0, 0, null);
+
+        } 
+        catch (BadLocationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	
 	
 	public void izpisSporocil() {
 		List<Sporocilo> sporocila = ChatFrame.sporocila; 

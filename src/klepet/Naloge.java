@@ -25,7 +25,6 @@ public class Naloge {
 	public static void get_index() {
 		try {
 			String hello = Request.Get("http://chitchat.andrej.com").execute().returnContent().asString();
-			System.out.println(hello);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -55,7 +54,7 @@ public class Naloge {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/users").addParameter("username", username).build();
 			String responseBody;
 			responseBody = Request.Post(uri).execute().returnContent().asString();
-			System.out.println(responseBody);
+			//System.out.println(responseBody);
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -71,7 +70,7 @@ public class Naloge {
 		try {
 			uri = new URIBuilder("http://chitchat.andrej.com/users").addParameter("username", username).build();
 			String responseBody = Request.Delete(uri).execute().returnContent().asString();
-			System.out.println(responseBody);
+			//System.out.println(responseBody);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (ClientProtocolException e) {
@@ -86,7 +85,7 @@ public class Naloge {
 	public static void send(Boolean global, String recipient, String sender, String text) {
 		try {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/messages").addParameter("username", sender).build();
-			System.out.println(uri);
+			//System.out.println(uri);
 			
 			
 			ObjectMapper mapper = new ObjectMapper();
@@ -94,11 +93,11 @@ public class Naloge {
 
 			Sporocilo message = new Sporocilo(global, recipient, text);
 			String jsonMessage = mapper.writeValueAsString(message);
-			System.out.println("json message: " + jsonMessage);
+			//System.out.println("json message: " + jsonMessage);
 
 			String responseBody = Request.Post(uri).bodyString(jsonMessage, ContentType.APPLICATION_JSON).execute()
 					.returnContent().asString();
-			System.out.println("responseBody: " + responseBody);
+			//System.out.println("responseBody: " + responseBody);
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
