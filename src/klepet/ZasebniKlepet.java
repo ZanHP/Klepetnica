@@ -1,39 +1,31 @@
 package klepet;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+@SuppressWarnings("serial")
 public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener {
 	
 	private JTextPane output; //sporocila
@@ -42,6 +34,7 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 
 	
 	public ZasebniKlepet(String uporabnik) {
+		// Okno zgradimo podobno kot okno ChatFrame.
 		super();
 		Container pane = this.getContentPane();
 		pane.setLayout(new GridBagLayout());
@@ -83,9 +76,8 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		pane.add(input, inputConstraint);
 		input.addKeyListener(this);
 		
-		
 		this.output = new JTextPane();
-		this.output.setText("<html>");
+		//this.output.setText("<html>");
 		this.output.setContentType("text/html");
 		this.output.setEditable(false); 
 		
@@ -138,7 +130,6 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 			for (Sporocilo sporocilo : sporocila) {
 				String posiljatelj = sporocilo.getSender();
 				if (posiljatelj.equals(uporabnik)) {
-					System.out.println(posiljatelj);
 					if (sporocilo.getGlobal().equals(false)) {
 						String besedilo = sporocilo.getText();
 						Date cas = sporocilo.getSent_at();

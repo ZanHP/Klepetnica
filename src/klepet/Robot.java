@@ -13,7 +13,6 @@ public class Robot extends TimerTask {
 	private int osvezitev = 500; // hitrost osveževanja
 	private int minute_od_zacetka = 0;
 	private int milisekunde_od_zacetka = 0;
-	private String cas = "";
 	
 	public Robot(ChatFrame chat) {
 		this.chat = chat;
@@ -35,11 +34,11 @@ public class Robot extends TimerTask {
 	}
 	
 	
+	@SuppressWarnings("static-access")
 	@Override
 	public void run() {
 		milisekunde_od_zacetka = milisekunde_od_zacetka + osvezitev;
-		minute_od_zacetka = milisekunde_od_zacetka / 6000;
-		cas = "Klepetaš že " + minute_od_zacetka + " minut";
+		minute_od_zacetka = milisekunde_od_zacetka / 60000;
 		chat.spremeniCas(minute_od_zacetka);
 		try {
 			chat.izpisUporabnikov();
@@ -51,19 +50,24 @@ public class Robot extends TimerTask {
 		if (chat.prijavljen) {
 			//obnovimo vsa prejeta sporocila
 			ChatFrame.sporocila = Naloge.receive(ChatFrame.jaz_klepetalec);
-			try {
-				chat.izpisSporocil();
-			} catch (ParseException | BadLocationException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			// Prva sporoèila so vèasih èudna, vsekakor jih ne potrebujemo,
+			// zato preskoèimo njihov izpis.
+			if (milisekunde_od_zacetka > osvezitev) {
+				try {
+					chat.izpisSporocil();
+				} catch (ParseException | BadLocationException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}	
+				if (chat.zasebni_klepeti.isEmpty() == false) {
+					//gremo po vseh uporabnikih, s katerimi imamo odprte zasebne pogovore
+					for (String uporabnik : chat.zasebni_klepeti.keySet()) {
+						chat.zasebni_klepeti.get(uporabnik).izpisSporocil();
+						}
+					};
 			}
-			}	
-			if (chat.zasebni_klepeti.isEmpty() == false) {
-				//gremo po vseh uporabnikih, s katerimi imamo odprte zasebne pogovore
-				for (String uporabnik : chat.zasebni_klepeti.keySet()) {
-					chat.zasebni_klepeti.get(uporabnik).izpisSporocil();
-					}
-				};
+			
 	}
 
 }

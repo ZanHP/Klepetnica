@@ -19,13 +19,11 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -66,8 +64,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.setTitle("blabla");
 		this.setMinimumSize(new Dimension(800,200));
 		
+		
 		this.addWindowListener(new WindowAdapter() {
 			@Override
+			// Ob zapiranju želimo ustaviti robota in se izpisati.
 			public void windowClosing(WindowEvent e) {
 				if (prijavljen.equals(true)) {
 					ChitChat.robot.deactivate();
@@ -114,8 +114,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		pane.add(input, inputConstraint);
 		input.addKeyListener(this);
 
-		// Definicija pisave.
-		Font oblika_label = new Font("Arial", Font.BOLD, 14);
+		
 
 		this.output = new JTextPane();
 		this.output.setText("<html>");
@@ -138,6 +137,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		scrollConstraint.gridy = 1;
 		pane.add(scroll, scrollConstraint);
 
+		// Definicija pisave.
+		Font oblika_label = new Font("Arial", Font.BOLD, 14);
+		
 		// Prostor za vzdevek.
 		JLabel vzdevek_napis = new JLabel("Ime:");
 		vzdevek_napis.setFont(oblika_label);
@@ -173,8 +175,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 		pane.add(uporabniki_scroll, uporscrollConstraint);
 		
-		// Kako dolgo že klepetamo.
-		//String cas_aktivnosti = cas_zacetka
+		// Kako dolgo že klepetamo. Spremeni se vsako minuto.
 		cas_aktivnosti = new JLabel("Ne postani odvisen!");
 		
 		cas_aktivnosti.setFont(oblika_label);
@@ -231,7 +232,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 				JButton gumb_aktivnez = new JButton(ime + " " + aktiven + " min");
 				gumb_aktivnez.setFont(gumb_aktivnez.getFont().deriveFont(Font.BOLD, 14f));
-				gumb_aktivnez.setMinimumSize(new Dimension(160, 40));
+				//gumb_aktivnez.setMinimumSize(new Dimension(160, 40));
 
 				// Glede na aktivnost doloèimo barvo.
 				if (Integer.valueOf(aktiven) < 2) {
@@ -263,6 +264,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		uporabniki_panel.repaint();
 	}
 
+	// Odpre novo okno za zasebni pogovor.
 	private void zasebni_pogovor(String uporabnik) {
 		if (prijavljen) {
 			if (zasebni_klepeti.keySet().contains(uporabnik)) {
@@ -271,15 +273,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				zasebni.pack();
 				zasebni.setVisible(true);
 				zasebni_klepeti.put(uporabnik, zasebni);
-				// System.out.println(zasebni_klepeti);
 			}
 		}
 	}
 
 	public void izpisSporocil() throws ParseException, BadLocationException, IOException {
-
-		// System.out.println("JAVNI izpis vseh za " + ChatFrame.jaz_klepetalec
-		// + ": " + sporocila);
 		if (sporocila.isEmpty()) {
 		} else {
 			for (Sporocilo sporocilo : sporocila) {
@@ -289,7 +287,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 				// Odloèimo se za preprosto obliko zapisovanja èasa,
 				// ta klepetalnica namreè ne shranjuje sporoèil in torej ni
-				// namenjena klepetanju dan za dnem, kjer bi morda potrebovali
+				// namenjena klepetanju dan za dnem, pri katerem bi morda potrebovali
 				// podatek od dnevu, ko je bilo neko sporoèilo poslano.
 				SimpleDateFormat df = new SimpleDateFormat("HH:mm");
 				String cas_string = df.format(cas);
@@ -299,9 +297,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					this.addMessage(posiljatelj, besedilo, cas_string);
 				} else {
 					if (zasebni_klepeti.keySet().contains(posiljatelj)) {
-						// ta primer uredi zasebni klepet
+						// Ta primer uredi zasebni klepet,
 					} else {
-						// sicer odpremo novega
+						// sicer odpremo novega.
 						this.zasebni_pogovor(posiljatelj);
 					}
 

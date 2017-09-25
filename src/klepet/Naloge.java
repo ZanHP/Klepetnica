@@ -22,13 +22,13 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class Naloge {
 
-	public static void get_index() {
-		try {
-			String hello = Request.Get("http://chitchat.andrej.com").execute().returnContent().asString();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void get_index() {
+//		try {
+//			String hello = Request.Get("http://chitchat.andrej.com").execute().returnContent().asString();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	// Pridobimo seznam uporabnikov.
 	@JsonProperty("username")
@@ -39,8 +39,7 @@ public class Naloge {
 		try {
 			String responseBody = Request.Get("http://chitchat.andrej.com/users").execute().returnContent().asString();
 			String uporabniki = responseBody;
-			TypeReference<List<Uporabnik>> t = new TypeReference<List<Uporabnik>>() {
-			};
+			TypeReference<List<Uporabnik>> t = new TypeReference<List<Uporabnik>>() {};
 			List<Uporabnik> klepetalci = mapper.readValue(uporabniki, t);
 			return (klepetalci);
 		} catch (IOException e) {
@@ -52,9 +51,7 @@ public class Naloge {
 	public static void log_in(String username) {
 		try {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/users").addParameter("username", username).build();
-			String responseBody;
-			responseBody = Request.Post(uri).execute().returnContent().asString();
-			//System.out.println(responseBody);
+			Request.Post(uri).execute().returnContent().asString();
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -66,11 +63,9 @@ public class Naloge {
 	}
 
 	public static void log_out(String username) {
-		URI uri;
 		try {
-			uri = new URIBuilder("http://chitchat.andrej.com/users").addParameter("username", username).build();
-			String responseBody = Request.Delete(uri).execute().returnContent().asString();
-			//System.out.println(responseBody);
+			URI uri = new URIBuilder("http://chitchat.andrej.com/users").addParameter("username", username).build();
+			Request.Delete(uri).execute().returnContent().asString();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (ClientProtocolException e) {
@@ -80,24 +75,18 @@ public class Naloge {
 		}
 
 	}
-	// public static void send (String me, String myMessage ){
 
 	public static void send(Boolean global, String recipient, String sender, String text) {
 		try {
 			URI uri = new URIBuilder("http://chitchat.andrej.com/messages").addParameter("username", sender).build();
-			//System.out.println(uri);
-			
 			
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.setDateFormat(new ISO8601DateFormat());
 
 			Sporocilo message = new Sporocilo(global, recipient, text);
 			String jsonMessage = mapper.writeValueAsString(message);
-			//System.out.println("json message: " + jsonMessage);
 
-			String responseBody = Request.Post(uri).bodyString(jsonMessage, ContentType.APPLICATION_JSON).execute()
-					.returnContent().asString();
-			//System.out.println("responseBody: " + responseBody);
+			Request.Post(uri).bodyString(jsonMessage, ContentType.APPLICATION_JSON).execute().returnContent().asString();
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -120,8 +109,6 @@ public class Naloge {
 			
 			TypeReference<List<Sporocilo>> t = new TypeReference<List<Sporocilo>>() {};
 			List<Sporocilo> uporSporocila = mapper.readValue(sporocila, t);
-			
-			//System.out.println("prejeto za " + me + ": " + uporSporocila);
 			return uporSporocila;
 
 		} catch (URISyntaxException e) {
@@ -134,7 +121,7 @@ public class Naloge {
 		return Collections.emptyList();
 	}
 
-	// Trenutni cas oblike HH:mm.
+	// Trenutni cas oblike HH:mm. Potrebujemo ga za izpis poslanih sporoèil.
 	public static String trenutniCas() {
 		Calendar cal = Calendar.getInstance();
 		Date cas = cal.getTime();

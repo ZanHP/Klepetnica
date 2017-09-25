@@ -38,11 +38,8 @@ public class Sporocilo {
 	
 	@Override
 	public String toString() {
-		return sender + ": " + text + "    ob " + sent_at;
+		return sender + ": " + text + ", ob " + sent_at;
 	}
-	
-	//"{ \"global\" : false, \"recipient\" : \""+friend+"\", \"text\" : \""+myMessage+"\"}";
-	
 	
 	@JsonProperty("global")
 	public Boolean getGlobal() {

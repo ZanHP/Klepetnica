@@ -16,10 +16,20 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="Z:/Programiranje/Klepetalnica/jackson-core-2.9.1.jar"/>
-	<classpathentry kind="lib" path="Z:/Programiranje/Klepetalnica/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="Z:/Programiranje/Klepetalnica/json-20160810.jar"/>
-	<classpathentry kind="lib" path="Z:/Programiranje/Klepetalnica/jackson-annotations-2.9.1.jar"/>
-	<classpathentry kind="lib" path="Z:/Programiranje/Klepetalnica/jackson-databind-2.9.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/fluent-hc-4.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/httpclient-4.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/httpclient-cache-4.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/httpclient-win-4.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/httpcore-4.4.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/httpmime-4.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/jackson-annotations-2.9.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/jackson-core-2.9.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/jackson-databind-2.9.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/json-20160810.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Žan/workspace/klepet/Klepetnica/knjiznice/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
