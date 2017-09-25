@@ -123,7 +123,7 @@ public class Naloge {
 			List<Sporocilo> uporSporocila = mapper.readValue(sporocila, t);
 			
 			//System.out.println("prejeto za " + me + ": " + uporSporocila);
-			return (uporSporocila);
+			return uporSporocila;
 
 		} catch (URISyntaxException e) {
 			e.printStackTrace();

@@ -9,13 +9,13 @@ public class Sporocilo {
 	private String sender;
 	private String recipient;
 	private String text;
-	private String sent_at;
+	private Date sent_at;
 		
 	@SuppressWarnings("unused")
 	private Sporocilo() {}
 	
 	//prejeto sporocilo
-	public Sporocilo(Boolean global, String recipient, String sender, String text, String sent_at) {
+	public Sporocilo(Boolean global, String recipient, String sender, String text, Date sent_at) {
 		this.global = global;
 		this.recipient = recipient;
 		this.sender = sender;
@@ -66,7 +66,7 @@ public class Sporocilo {
 	}
 	
 	@JsonProperty("sent_at")
-	public String getSent_at() {
+	public Date getSent_at() {
 		return sent_at;
 	}
 }

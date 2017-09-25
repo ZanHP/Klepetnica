@@ -1,12 +1,9 @@
 package klepet;
 
-import java.awt.Adjustable;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -14,19 +11,20 @@ import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +35,16 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.utils.URIBuilder;
 
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
+@SuppressWarnings("serial")
 public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	private JTextArea output; //sporocila
@@ -62,7 +58,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public static String jaz_klepetalec = System.getProperty("user.name");
 	public Boolean prijavljen = false;
 	
-	public Map<String, ZasebniKlepet> zasebni_klepeti;
+	public static Map<String, ZasebniKlepet> zasebni_klepeti;
 	static List<Sporocilo> sporocila = Collections.emptyList();
 
 	public ChatFrame() {
@@ -72,7 +68,20 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.setTitle("blabla");
 		this.setMinimumSize(new Dimension(700,500));
 		
+		this.addWindowListener(new WindowAdapter() 
+		{
+		@Override
+		public void windowClosing(WindowEvent e) {
+			if (prijavljen.equals(true)) {
+				ChitChat.robot.deactivate();
 
+				Naloge.log_out(jaz_klepetalec);
+				for (ZasebniKlepet zasebni : zasebni_klepeti.values()) {
+					zasebni.dispose();
+				}
+			}
+		}
+		});
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -98,8 +107,14 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		pane.add(input, inputConstraint);
 		input.addKeyListener(this);
 		
+		//Definiciji pisav.
+		Font oblika_label = new Font("Arial", Font.BOLD, 14);
+		Font oblika_poslano = new Font("Courier", Font.ITALIC, 12);
+		
 		this.output = new JTextArea(20, 40);
+		this.output.setFont(oblika_poslano);
 		this.output.setEditable(false);
+		//this.output.set
 		
 		JScrollPane scroll = new JScrollPane(output);
 		        
@@ -109,15 +124,15 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		scrollConstraint.fill = GridBagConstraints.BOTH;
 		scrollConstraint.gridx = 0;
 		scrollConstraint.gridy = 1;
-		pane.add(scroll, scrollConstraint);
-
-		
+		pane.add(scroll, scrollConstraint);		
 		
 		//Prostor za vzdevek.
 		JLabel vzdevek_napis = new JLabel("Ime:");
+		vzdevek_napis.setFont(oblika_label);
 		panel.add(vzdevek_napis);
 		this.vzdevek_vnos = new JTextField(20);
 		panel.add(vzdevek_vnos);
+		vzdevek_vnos.addKeyListener(this);
 		
 		gumb_prijavi = new JButton("Prijavi se!");
 		panel.add(gumb_prijavi);
@@ -128,12 +143,13 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		gumb_odjavi.addActionListener(this);
 		gumb_odjavi.setEnabled(false);		
 		
-		
 		//Prostor za izpis prijavljenih klepetalcev.
 		this.uporabniki_panel = new JPanel();
+		JLabel aktivni = new JLabel("Trenutno prijavljeni:");
+		aktivni.setFont(oblika_label);
+		pane.add(aktivni);
 		JScrollPane uporabniki_scroll = new JScrollPane(uporabniki_panel);
 		uporabniki_scroll.setPreferredSize(new Dimension(160, 300)); 
-		//this.klepetalci.setEditable(false);
 		GridBagConstraints uporscrollConstraint = new GridBagConstraints();
 		uporscrollConstraint.fill = GridBagConstraints.BOTH;
 		uporscrollConstraint.gridheight = 2;
@@ -145,14 +161,15 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 		pane.add(uporabniki_scroll, uporscrollConstraint);
 		
-		zasebni_klepeti = new HashMap<String, ZasebniKlepet>(); //seznam robotov zasebnih pogovorov
+		//seznam robotov zasebnih pogovorov
+		zasebni_klepeti = new HashMap<String, ZasebniKlepet>(); 
 		
 	}
 	
 	    
-	public void addMessage(String posiljatelj, String sporocilo) {
-		String chat = this.output.getText();
-		this.output.setText(chat + posiljatelj + ": " + sporocilo + "  , ob " + Naloge.trenutniCas() + "\n");
+	public void addMessage(String posiljatelj, String sporocilo, String cas) {
+		String novo = " " + posiljatelj + ": " + sporocilo + "  , ob " + cas + "\n";
+		this.output.append(novo);
 	}
 	
 	public void izpisUporabnikov () throws ParseException {
@@ -166,12 +183,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				String aktiven = String.valueOf(uporabnik.getLastActive());
 				
 				JButton gumb_aktivnez = new JButton(ime + " " + aktiven + " min");
-				gumb_aktivnez.setBorder(new LineBorder(Color.RED));
 				gumb_aktivnez.setFont(gumb_aktivnez.getFont().deriveFont(Font.BOLD, 14f));
-				gumb_aktivnez.setSize(new Dimension(140, 40) );
-				gumb_aktivnez.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-				gumb_aktivnez.setBorder(BorderFactory.createEtchedBorder(1));
-				gumb_aktivnez.setAlignmentX(Component.CENTER_ALIGNMENT);
+				gumb_aktivnez.setMinimumSize(new Dimension(160, 40) );
 				
 				//glede na aktivnost dolocimo barvo
 				if (Integer.valueOf(aktiven) < 2) {
@@ -187,7 +200,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 								
 				}}}
 				uporabniki_panel.add(gumb_aktivnez);
-				
+						
 				gumb_aktivnez.addActionListener( new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
@@ -204,27 +217,48 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	
 	private void zasebni_pogovor(String uporabnik) {
-		ZasebniKlepet zasebni = new ZasebniKlepet(uporabnik);
-		//Robot zasebni_robot = new Robot(zasebni);
-		zasebni.pack();
-		zasebni.setVisible(true);
-		//zasebni_robot.activate();
-		zasebni_klepeti.put(uporabnik, zasebni);
-		System.out.println(zasebni_klepeti);
+		if (prijavljen) {
+			if (zasebni_klepeti.keySet().contains(uporabnik)) {
+			} else {
+				ZasebniKlepet zasebni = new ZasebniKlepet(uporabnik);
+				zasebni.pack();
+				zasebni.setVisible(true);
+				zasebni_klepeti.put(uporabnik, zasebni);
+				System.out.println(zasebni_klepeti);
+			}
+		}
 	}
 	
 	
 	
-	public void izpisSporocil() {
+	public void izpisSporocil() throws ParseException {
 		
 		System.out.println("JAVNI izpis vseh za " + ChatFrame.jaz_klepetalec + ": " + sporocila);
 		if (sporocila.isEmpty()) { 
 			} else {		
 			for (Sporocilo sporocilo : sporocila) {
+				String besedilo = sporocilo.getText();
+				String posiljatelj = sporocilo.getSender();
+				Date cas = sporocilo.getSent_at();
+				
+				//Odloèimo se za preprosto obliko zapisovanja èasa,
+				//ta klepetalnica namreè ne shranjuje sporoèil in torej ni
+				//namenjena klepetanju dan za dnem, kjer bi morda potrebovali
+				//podatek od dnevu, ko je bilo neko sporoèilo poslano.
+				SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+				String cas_string = df.format(cas);
+				
 				if (sporocilo.getGlobal()) {
-					String besedilo = sporocilo.getText();
-					String posiljatelj = sporocilo.getSender();
-					this.addMessage(posiljatelj, besedilo);
+					//javno sporoèilo dodamo v output
+					this.addMessage(posiljatelj, besedilo, cas_string);
+				} else {
+					if (zasebni_klepeti.keySet().contains(posiljatelj)) {
+						//ta primer uredi zasebni klepet
+					} else {
+						//sicer odpremo novega
+						this.zasebni_pogovor(posiljatelj);
+					}
+					
 				}
 				}
 			}
@@ -238,7 +272,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			vpis(jaz_klepetalec);
 		}
 		
-		if (e.getSource() == this.gumb_odjavi) {
+		if (e.getSource() == gumb_odjavi) {
 			izpis(jaz_klepetalec);
 			}
 		}
@@ -255,6 +289,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			}
 	}
 	
+	@SuppressWarnings("static-access")
 	private void izpis(String klepetalec) {
 		gumb_prijavi.setEnabled(true);
 		gumb_odjavi.setEnabled(false);
@@ -262,17 +297,16 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		vzdevek_vnos.setEditable(true);
 		vzdevek_vnos.requestFocusInWindow();
 		prijavljen = false;
+		this.zasebni_klepeti = Collections.emptyMap();
 		Naloge.log_out(klepetalec);
 	}
 	
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		//TODO
 		if (e.getSource() == this.vzdevek_vnos) {
-			System.out.println("pritisk_vpis");
 			if (e.getKeyChar() == '\n') {
-				System.out.println("enter_vpis");
+				jaz_klepetalec = this.vzdevek_vnos.getText(); 
 				vpis(jaz_klepetalec);
 			}
 		}
@@ -280,37 +314,14 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			if (e.getKeyChar() == '\n') {
 				if (this.input.getText().equals("") == false) {
 					Naloge.send(true, "", jaz_klepetalec, this.input.getText());
-					this.addMessage(this.vzdevek_vnos.getText(), this.input.getText());
+					this.addMessage(this.vzdevek_vnos.getText(), this.input.getText(), Naloge.trenutniCas());
 					this.input.setText("");
 					}
 				}
 		}		
 	}
 
-	public void windowClosed(WindowEvent e) {
-		if (prijavljen) {
-			Naloge.log_out(jaz_klepetalec);
-		}
-		ChitChat.robot.deactivate();
-
-	}
-
-
-	public void windowClosing(WindowEvent e) {
-		System.out.println("zapiranje okna");
-		if (prijavljen) {
-			Naloge.log_out(jaz_klepetalec);
-		}
-		ChitChat.robot.deactivate();
-
-	}
-
-	public void windowOpened(WindowEvent e) {
-		System.out.println("odpiranje okna");
-		vzdevek_vnos.requestFocusInWindow();
-		
-	}
-
+	
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -325,22 +336,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 	}
 	
-	public void zapiranje() {
-		System.out.println("zapiranje okna");
-		if (vzdevek_vnos.isFocusOwner() == false) {
-			Naloge.log_out(jaz_klepetalec);
-		}
-		ChitChat.robot.deactivate();		
-		}
 
-
-//class FrameListener extends WindowAdapter {
-//   public void windowClosing(WindowEvent e){
-//		this.zapiranje();
-//  }
-//
-//private void zapiranje() {
-//	zapiranje();
 	
 }
 

@@ -16,6 +16,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -27,7 +29,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener, WindowListener {
+public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener {
 	
 	private JTextArea output; //sporocila
 	private JTextField input; //vnos sporocila
@@ -40,6 +42,18 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		pane.setLayout(new GridBagLayout());
 		this.setTitle(uporabnik);
 		this.setMinimumSize(new Dimension(300,200));
+		
+		this.addWindowListener(new WindowAdapter() 
+		{
+		@Override
+		public void windowClosing(WindowEvent e) {
+			ChatFrame.zasebni_klepeti.remove(uporabnik);
+		}
+		
+		public void windowActivated(WindowEvent e) {
+			input.requestFocus();
+		}
+		});
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -88,28 +102,25 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 	}
 	
 
-	private void addMessage(String posiljatelj, String sporocilo) {
-		String chat = this.output.getText();
-		this.output.setText(chat + posiljatelj + ": " + sporocilo + "  , ob " + Naloge.trenutniCas() + "\n");
+	private void addMessage(String posiljatelj, String sporocilo, String cas) {
+		String novo = " " + posiljatelj + ": " + sporocilo + "  , ob " + cas + "\n";
+		this.output.append(novo);
 	}
 	
 	public void izpisSporocil() {
 		List<Sporocilo> sporocila = ChatFrame.sporocila; 
-				//Naloge.receive(ChatFrame.jaz_klepetalec); 
-		System.out.println("izpis vseh za " + ChatFrame.jaz_klepetalec + ": " + sporocila);
-		if (sporocila.isEmpty()) { 
-			System.out.println("izpis zasebnih, prazen seznam");
+		if (sporocila.isEmpty()) { 			
 		} else {
-			System.out.println("izpis zasebnih");
 			for (Sporocilo sporocilo : sporocila) {
-				
 				String posiljatelj = sporocilo.getSender();
-				System.out.println("posiljatelj " + posiljatelj);
 				if (posiljatelj.equals(uporabnik)) {
 					System.out.println(posiljatelj);
 					if (sporocilo.getGlobal().equals(false)) {
-					String besedilo = sporocilo.getText();
-					this.addMessage(posiljatelj, besedilo);
+						String besedilo = sporocilo.getText();
+						Date cas = sporocilo.getSent_at();
+						SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+						String cas_string = df.format(cas);
+						this.addMessage(posiljatelj, besedilo, cas_string);
 					}
 				}
 			}
@@ -134,75 +145,17 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 			if (e.getKeyChar() == '\n') {
 				if (this.input.getText().equals("") == false) {
 					Naloge.send(false, uporabnik, ChatFrame.jaz_klepetalec, this.input.getText());
-					this.addMessage(ChatFrame.jaz_klepetalec, this.input.getText());
+					this.addMessage(ChatFrame.jaz_klepetalec, this.input.getText(), Naloge.trenutniCas());
 					this.input.setText("");
 					}
 				}
 		}
-		
 	}
-
-
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
-
-
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }
