@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
@@ -39,7 +41,7 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		Container pane = this.getContentPane();
 		pane.setLayout(new GridBagLayout());
 		this.setTitle(uporabnik);
-		this.setMinimumSize(new Dimension(300,200));
+		this.setMinimumSize(new Dimension(300,400));
 		
 		this.addWindowListener(new WindowAdapter() 
 		{
@@ -82,6 +84,12 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		this.output.setEditable(false); 
 		
 		JScrollPane scroll = new JScrollPane(output);
+		
+		scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+			}
+		});
 		        
 		GridBagConstraints scrollConstraint = new GridBagConstraints();
 		scrollConstraint.weightx = 1;
