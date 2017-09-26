@@ -113,14 +113,13 @@ public class ZasebniKlepet extends JFrame implements ActionListener, KeyListener
 		HTMLDocument doc = (HTMLDocument) output.getDocument(); 
 		HTMLEditorKit editorKit = (HTMLEditorKit) output.getEditorKit();
 		
-		String novo = "<font face='courier new'><b>" + posiljatelj + "</b>" + ": " + 
-						sporocilo + "&nbsp &nbsp </font>" + "<font face='courier new' size='3'>ob " + cas + "</font>";
+		String kdo_kdaj = "<font face='courier new'><b><i>" + posiljatelj + "</i></b>" + "<font face='courier new' size='3'> ob " + cas + ": <br></font>";
+		String besedilo = "<font face='courier new'> &nbsp &nbsp " + sporocilo + "</font>" ;
 		if (posiljatelj.equals(ChatFrame.jaz_klepetalec)) {
-			novo = "&nbsp &nbsp &nbsp &nbsp" + novo;
+			besedilo =  "<i>" + besedilo + "</i>";
 		}
 		try {
-        	editorKit.insertHTML(doc, doc.getLength(), novo, 0, 0, null);
-
+        	editorKit.insertHTML(doc, doc.getLength(), kdo_kdaj + besedilo, 0, 0, null);
         } 
         catch (BadLocationException e) {
             e.printStackTrace();
